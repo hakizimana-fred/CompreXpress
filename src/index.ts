@@ -6,7 +6,9 @@ class ReadFile {
       const data = readFileSync(filePath, "utf-8");
       const frequencies = this.charFrequency(data);
       const huffmanTree = this.binaryHuffmanTree(frequencies);
-      console.log("huffman", huffmanTree);
+      const prefixedCodeTAble = this.prefixCodeTable(huffmanTree);
+
+      console.log(prefixedCodeTAble, "prefixed");
     } else {
       console.log("this is file path is invalid");
     }
@@ -17,7 +19,7 @@ class ReadFile {
   }
 
   charFrequency(data: string) {
-    const frequency: Record<any, any> = {};
+    const frequency: Record<string, number> = {};
 
     for (const char of data) {
       if (/[a-zA-Z]/.test(char)) {
@@ -33,7 +35,7 @@ class ReadFile {
     return frequency;
   }
 
-  binaryHuffmanTree(frequentChars: Record<any, any>): any {
+  binaryHuffmanTree(frequentChars: Record<string, number>): any {
     //return frequentChars;
     const leafNodes = Object.keys(frequentChars).map((char) => ({
       character: char,
@@ -50,13 +52,29 @@ class ReadFile {
       const internalNode = {
         left,
         right,
-        frequency: left?.frequency + right?.frequency,
+        frequency: left!.frequency + right!.frequency,
       } as any;
 
       nodes.push(internalNode);
     }
 
     return nodes[0];
+  }
+  prefixCodeTable(huffmanTree: any): Record<string, string> {
+    const codeTable: Record<string, string> = {};
+
+    function traverse(node: any, currentCode: string) {
+      if (node.left === undefined && node.right === undefined) {
+        codeTable[node.character] = currentCode;
+      } else {
+        traverse(node.left, currentCode + "0");
+        traverse(node.right, currentCode + "1");
+      }
+    }
+
+    traverse(huffmanTree, "");
+
+    return codeTable;
   }
 }
 
