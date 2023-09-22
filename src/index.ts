@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "fs";
 
 class FileCompressor {
   huffmanTree = null;
-  charMapping = {};
+  charMapping: any = {};
 
   uploadFile(filePath: string): any {
     if (this.isValidPath(filePath)) {
@@ -17,7 +17,8 @@ class FileCompressor {
         delimiter: "|||",
       };
 
-      console.log(header, "just header");
+      const compressedData = this.compressedData(data);
+      console.log(compressedData);
     } else {
       console.log("Invalid file path");
     }
@@ -83,6 +84,17 @@ class FileCompressor {
     traverse(huffmanTree, "");
 
     return codeTable;
+  }
+  compressedData(data: string) {
+    let encodedText: string = "";
+
+    for (const char of data) {
+      if (char in this.charMapping) {
+        encodedText += this.charMapping[char];
+      }
+    }
+
+    return encodedText;
   }
 }
 
