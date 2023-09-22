@@ -1,16 +1,25 @@
 import { existsSync, readFileSync } from "fs";
 
-class ReadFile {
+class FileCompressor {
+  huffmanTree = null;
+  charMapping = {};
+
   uploadFile(filePath: string): any {
     if (this.isValidPath(filePath)) {
       const data = readFileSync(filePath, "utf-8");
       const frequencies = this.charFrequency(data);
-      const huffmanTree = this.binaryHuffmanTree(frequencies);
-      const prefixedCodeTAble = this.prefixCodeTable(huffmanTree);
+      this.huffmanTree = this.binaryHuffmanTree(frequencies);
+      this.charMapping = this.prefixCodeTable(this.huffmanTree);
 
-      console.log(prefixedCodeTAble, "prefixed");
+      const header = {
+        huffmanTree: this.huffmanTree,
+        charMapping: this.charMapping,
+        delimiter: "|||",
+      };
+
+      console.log(header, "just header");
     } else {
-      console.log("this is file path is invalid");
+      console.log("Invalid file path");
     }
   }
 
@@ -36,7 +45,6 @@ class ReadFile {
   }
 
   binaryHuffmanTree(frequentChars: Record<string, number>): any {
-    //return frequentChars;
     const leafNodes = Object.keys(frequentChars).map((char) => ({
       character: char,
       frequency: frequentChars[char],
@@ -79,7 +87,7 @@ class ReadFile {
 }
 
 const main = () => {
-  const file = new ReadFile();
+  const file = new FileCompressor();
   file.uploadFile("/home/ngeni_fred/Desktop/file.txt");
 };
 
